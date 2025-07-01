@@ -1,0 +1,43 @@
+name: Content Validator
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install openai-whisper transformers pandas gspread oauth2client PyPDF2 torch torchvision torchaudio Pillow boto3
+
+      - name: Run content validation
+        run: python validate_content.py
+
+      - name: Print validation report to console
+        run: cat validation_report.txt
+
+      - name: List files
+        run: ls -la
+
+      - name: Upload validation report
+        if: always()  # Run this step even if validation fails
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-report
+          path: ./validation_report.txt
