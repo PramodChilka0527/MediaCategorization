@@ -42,7 +42,7 @@ classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnl
 with open("validation_report.txt", "w") as report:
     report.write(" Validation Report\n")
 
-    print("Fetching files from S3...")
+    # print("Fetching files from S3...")
     response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=PREFIX)
 
     if "Contents" not in response:
@@ -56,7 +56,7 @@ with open("validation_report.txt", "w") as report:
                 continue
 
             filename = os.path.basename(key)
-            report.write(f" Processing: {filename}\n")
+            report.write(f" File Name: {filename}\n")
 
             try:
                 s3_response = s3.get_object(Bucket=BUCKET_NAME, Key=key)
@@ -113,7 +113,7 @@ with open("validation_report.txt", "w") as report:
                 report.write(f"Confidence: {top_score * 100:.0f}%\n")
 
                 if top_score < THRESHOLD:
-                    report.write(f" Validation failed: Confidence Score is below ({THRESHOLD * 100:.0f}%)\n\n")
+                    report.write(f" Validation failed due to the confidence Score of the {filename} is below ({THRESHOLD * 100:.0f}%)\n\n")
                     has_failure = True
                 else:
                     report.write(" Validation passed.\n\n")
@@ -122,7 +122,7 @@ with open("validation_report.txt", "w") as report:
                 report.write(f" Error in processing file: {e}\n\n")
                 has_failure = True
 
-print("Validation completed. Report saved as validation_report.txt")
+print("Validation completed. Please download validation_report.txt from the artifacts section to review the status for each media file.")
 
 # Ensure GitHub fails the job if any file failed
 if has_failure:
