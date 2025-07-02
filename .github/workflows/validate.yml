@@ -29,6 +29,16 @@ jobs:
       - name: Run content validation
         run: python validate_content.py
 
+      - name: Comment on PR if validation failed
+        if: failure()
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          message: |
+            ❌ **Media Validation Failed**
+            - One or more media files did not meet categorization or quality thresholds.
+            - Please review logs in the CI run and update your PR with valid media files.
+            ✅ Push new commits to re-trigger validation.
+
       - name: Print validation report to console
         run: cat validation_report.txt
 
