@@ -28,6 +28,7 @@ categories = ["educational", "entertainment", "sports", "news", "documentary"]
 report_lines = []
 has_failure = False
 
+
 # Load models once
 from whisper import load_model
 whisper_model = load_model("base")
