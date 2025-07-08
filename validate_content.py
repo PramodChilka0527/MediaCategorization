@@ -17,6 +17,7 @@ s3 = boto3.client(
     aws_session_token=os.environ["AWS_SESSION_TOKEN"]
 )
 
+
 # ======================
 # S3 Configuration
 # ======================
