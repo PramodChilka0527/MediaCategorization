@@ -17,15 +17,14 @@ s3 = boto3.client(
     aws_session_token=os.environ["AWS_SESSION_TOKEN"]
 )
 
-
 # ======================
 # S3 Configuration
 # ======================
 BUCKET_NAME = "cicd-validation-media"
 PREFIX = "Valid_Files/"
 # PREFIX = "Error_Files/"
-THRESHOLD = 0.8
-categories = ["educational", "entertainment", "sports", "news", "documentary"]
+THRESHOLD = 0.9
+categories = ["educational", "entertainment", "sports", "news", "movie"]
 report_lines = []
 has_failure = False
 
@@ -70,9 +69,20 @@ with open("validation_report.txt", "w") as report:
                     result = whisper_model.transcribe("temp_media_file")
                     transcript = result["text"]
 
-                    result = classifier(transcript, candidate_labels=categories)
-                    top_label = result['labels'][0]
-                    top_score = result['scores'][0]
+                    adult_labels=["abusive", "explicit", "18+", "clean", "safe for kids"]                    
+                    adult_result = classifier(transcript, candidate_labels=adult_labels)
+                    adult_label = adult_result['labels'][0]
+                    adult_score = adult_result['scores'][0]
+                    report.write(f" Adult Content Check: {adult_label} ({ adult_score * 100:.0f}%)\n")
+
+                    if adult_label in ["abusive", "explicit", "18+"] and adult_score > 0.5:
+                        report.write("Detected explicit or abusive content. Marked as 18+.\n")                        
+                        has_failure = True
+                        continue
+                    else:
+                        adult_result = classifier(transcript, candidate_labels=categories)
+                        top_label = result['labels'][0]
+                        top_score = result['scores'][0]
 
                 elif filename.endswith(('.jpg', '.jpeg', '.png', '.bmp', '.webp')):
                     try:
@@ -112,7 +122,8 @@ with open("validation_report.txt", "w") as report:
 
                 report.write(f"Predicted Category: {top_label}\n")
                 report.write(f"Confidence: {top_score * 100:.0f}%\n")
-
+                
+                
                 if top_score < THRESHOLD:
                     report.write(f" Validation failed due to the confidence Score of the {filename} is below ({THRESHOLD * 100:.0f}%)\n\n")
                     has_failure = True
