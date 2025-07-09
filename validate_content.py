@@ -69,7 +69,8 @@ with open("validation_report.txt", "w") as report:
                     result = whisper_model.transcribe("temp_media_file")
                     transcript = result["text"]
 
-                    result = classifier(transcript, candidate_labels=categories)
+                    adult_labels=["abusive", "explicit", "18+", "clean", "safe for kids"]
+                    result = classifier(transcript, candidate_labels=adult_labels)
                     top_label = result['labels'][0]
                     top_score = result['scores'][0]
 
@@ -111,7 +112,8 @@ with open("validation_report.txt", "w") as report:
 
                 report.write(f"Predicted Category: {top_label}\n")
                 report.write(f"Confidence: {top_score * 100:.0f}%\n")
-
+                
+                
                 if top_score < THRESHOLD:
                     report.write(f" Validation failed due to the confidence Score of the {filename} is below ({THRESHOLD * 100:.0f}%)\n\n")
                     has_failure = True
