@@ -73,7 +73,7 @@ with open("validation_report.txt", "w") as report:
                     adult_result = classifier(transcript, candidate_labels=adult_labels)
                     adult_label = adult_result['labels'][0]
                     adult_score = adult_result['scores'][0]
-                    report.write(f" Adult Content Check: {adult_label} ({ adult_score * 100:.0f}%)\n\n")
+                    report.write(f" Adult Content Check: {adult_label} ({ adult_score * 100:.0f}%)\n")
 
                     if adult_label in ["abusive", "explicit", "18+"] and adult_score > 0.5:
                         report.write("Detected explicit or abusive content. Marked as 18+.\n")                        
@@ -127,8 +127,8 @@ with open("validation_report.txt", "w") as report:
                 if top_score < THRESHOLD:
                     report.write(f" Validation failed due to the confidence Score of the {filename} is below ({THRESHOLD * 100:.0f}%)\n\n")
                     has_failure = True
-                # else:
-                    # report.write(" Validation passed.\n\n")
+                else:
+                    report.write(" Validation passed.\n\n")
 
             except Exception as e:
                 report.write(f" Error in processing file: {e}\n\n")
