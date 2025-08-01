@@ -7,6 +7,7 @@ from PIL import Image, UnidentifiedImageError
 from PyPDF2 import PdfReader
 from PyPDF2.errors import PdfReadError
 
+
 # ======================
 #  AWS Temporary Credentials Setup
 # ======================
